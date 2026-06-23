@@ -8,7 +8,7 @@ The system is optimized to manage the reservation and sale of seats for multiple
 
 ## 🛠️ Tech Stack
 
-*   **Backend:** Java 21 & Spring Boot 3.x
+*   **Backend:** Java 17/21 & Spring Boot 3.x
 *   **Persistence:** JPA / Hibernate & PostgreSQL
 *   **Containers:** Docker & Docker Compose
 *   **Testing:** JUnit 5 & Testcontainers (PostgreSQL)
@@ -46,9 +46,9 @@ docker-compose down
 
 | Method | Endpoint | Description | Status |
 | :--- | :--- | :--- | :--- |
-| **`GET`** | `/api/v1/eventos/{eventoId}/asientos` | Get the list of seats for an event and their current status. | ⏳ Pending |
-| **`POST`** | `/api/v1/reservas` | Create a temporary reservation for a seat (valid for 10 min). | ⏳ Pending |
-| **`POST`** | `/api/v1/reservas/{reservaId}/confirmar` | Confirm the purchase and make the seat reservation permanent. | ⏳ Pending |
+| **`GET`** | `/api/v1/events/{eventId}/seats` | Get the list of seats for an event and their current status. | ⏳ Pending |
+| **`POST`** | `/api/v1/reservations` | Create a temporary reservation for a seat (valid for 10 min). | ⏳ Pending |
+| **`POST`** | `/api/v1/reservations/{reservationId}/confirm` | Confirm the purchase and make the seat reservation permanent. | ⏳ Pending |
 
 ---
 
