@@ -11,4 +11,5 @@ import java.util.UUID;
 public interface RoomRepository extends JpaRepository<Room, UUID> {
     boolean existsByNumber(int number);
     List<Room> findAllByNumber(int number);
+    Room findByNumber(int number);
 }
