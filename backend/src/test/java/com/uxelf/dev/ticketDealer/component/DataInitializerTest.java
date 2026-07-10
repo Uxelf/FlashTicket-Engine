@@ -43,7 +43,7 @@ public class DataInitializerTest {
 
 
     @Test
-    void testRoomCreation() throws Exception{
+    void whenAppStarts_thenRoomsAreCreated() throws Exception{
         List<Integer> numbers = appConfig.getRooms()
                 .stream().map(AppConfig.RoomProperties::getNumber).toList();
 
@@ -54,7 +54,7 @@ public class DataInitializerTest {
     }
 
     @Test
-    void testRoomCreationNoDuplicates() throws Exception{
+    void whenAppStartsTwice_thenRoomsAreNotDuplicated() throws Exception{
         List<Integer> numbers = appConfig.getRooms()
                 .stream().map(AppConfig.RoomProperties::getNumber).toList();
 
