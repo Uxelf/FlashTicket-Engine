@@ -13,11 +13,11 @@ public class EventRequest {
     @NotNull
     private int room_number;
 
-    @Future
+    @Future (message = "start has to be a future date")
     @NotNull
     private LocalDateTime start;
 
-    @Future
+    @Future (message = "end has to be a future date")
     @NotNull
     private LocalDateTime end;
 }
