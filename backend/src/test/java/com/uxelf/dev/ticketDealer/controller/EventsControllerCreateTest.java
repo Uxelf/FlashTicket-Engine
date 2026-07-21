@@ -29,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @SpringBootTest
 @Testcontainers
-class EventsControllerTest {
+class EventsControllerCreateTest {
 
     @Autowired
     private MockMvc mockMvc;
