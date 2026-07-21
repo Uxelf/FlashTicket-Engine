@@ -1,12 +1,10 @@
-package com.uxelf.dev.ticketDealer.controller;
+package com.uxelf.dev.ticketDealer.controller.events;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.uxelf.dev.ticketDealer.component.AppConfig;
 import com.uxelf.dev.ticketDealer.dto.EventListResponse;
 import com.uxelf.dev.ticketDealer.dto.EventRequest;
-import com.uxelf.dev.ticketDealer.entity.Event;
 import com.uxelf.dev.ticketDealer.repository.EventRepository;
-import com.uxelf.dev.ticketDealer.repository.EventSeatRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,8 +21,6 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
