@@ -25,7 +25,4 @@ public class Event {
 
     private LocalDateTime start_time;
     private LocalDateTime end_time;
-
-    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<EventSeat> eventSeats;
 }
