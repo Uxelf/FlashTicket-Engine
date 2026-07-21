@@ -1,5 +1,6 @@
 package com.uxelf.dev.ticketDealer.controller;
 
+import com.uxelf.dev.ticketDealer.dto.EventListResponse;
 import com.uxelf.dev.ticketDealer.dto.EventRequest;
 import com.uxelf.dev.ticketDealer.dto.EventResponse;
 import com.uxelf.dev.ticketDealer.entity.Event;
@@ -10,12 +11,24 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/events")
 @AllArgsConstructor
 public class EventsController {
 
     private EventsService eventsService;
+
+
+    @GetMapping
+    public ResponseEntity<EventListResponse> getEvents(){
+        List<Event> eventList = eventsService.getEvents();
+        EventListResponse eventListResponse = new EventListResponse();
+        eventListResponse.setEvents(eventList);
+        return ResponseEntity.ok(eventListResponse);
+    }
 
     @PostMapping
     public ResponseEntity<EventResponse> createEvent(@RequestBody @Valid EventRequest request){

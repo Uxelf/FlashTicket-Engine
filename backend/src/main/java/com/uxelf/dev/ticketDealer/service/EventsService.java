@@ -27,6 +27,10 @@ public class EventsService {
     private SeatRepository seatRepository;
     private EventSeatRepository eventSeatRepository;
 
+    public List<Event> getEvents(){
+        return eventRepository.findAll();
+    }
+
     public Event createEvent(EventRequest request) throws Exception{
 
         Room room = roomRepository.findByNumber(request.getRoom_number());
