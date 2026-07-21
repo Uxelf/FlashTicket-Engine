@@ -1,4 +1,4 @@
-package com.uxelf.dev.ticketDealer.controller;
+package com.uxelf.dev.ticketDealer.controller.events;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.uxelf.dev.ticketDealer.component.AppConfig;

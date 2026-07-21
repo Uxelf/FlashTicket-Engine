@@ -15,6 +15,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 
 @Getter
@@ -70,6 +72,19 @@ public class EventsService {
         }
 
         eventSeatRepository.saveAll(eventSeatList);
+    }
+
+    public boolean deleteEvent(UUID id){
+
+        if (id == null)
+            return false;
+
+        Optional<Event> event = eventRepository.findById(id);
+        if (event.isEmpty())
+            return false;
+
+        eventRepository.deleteById(event.get().getId());
+        return true;
     }
 
 }
