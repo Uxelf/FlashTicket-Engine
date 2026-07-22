@@ -1,9 +1,9 @@
 package com.uxelf.dev.ticketDealer.controller;
 
-import com.uxelf.dev.ticketDealer.dto.EventDeleteResponse;
-import com.uxelf.dev.ticketDealer.dto.EventListResponse;
-import com.uxelf.dev.ticketDealer.dto.EventRequest;
-import com.uxelf.dev.ticketDealer.dto.EventResponse;
+import com.uxelf.dev.ticketDealer.dto.event.EventDeleteResponse;
+import com.uxelf.dev.ticketDealer.dto.event.EventListResponse;
+import com.uxelf.dev.ticketDealer.dto.event.EventRequest;
+import com.uxelf.dev.ticketDealer.dto.event.EventResponse;
 import com.uxelf.dev.ticketDealer.entity.Event;
 import com.uxelf.dev.ticketDealer.exception.AppBadRequestException;
 import com.uxelf.dev.ticketDealer.service.EventsService;
@@ -13,7 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 

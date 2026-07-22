@@ -3,7 +3,7 @@ package com.uxelf.dev.ticketDealer.exception;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.uxelf.dev.ticketDealer.component.AppConfig;
 import com.uxelf.dev.ticketDealer.dto.ErrorResponse;
-import com.uxelf.dev.ticketDealer.dto.EventRequest;
+import com.uxelf.dev.ticketDealer.dto.event.EventRequest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
