@@ -1,4 +1,4 @@
-package com.uxelf.dev.ticketDealer.dto;
+package com.uxelf.dev.ticketDealer.dto.event;
 
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotNull;

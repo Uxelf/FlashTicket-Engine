@@ -2,8 +2,8 @@ package com.uxelf.dev.ticketDealer.controller.events;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.uxelf.dev.ticketDealer.component.AppConfig;
-import com.uxelf.dev.ticketDealer.dto.EventRequest;
-import com.uxelf.dev.ticketDealer.dto.EventResponse;
+import com.uxelf.dev.ticketDealer.dto.event.EventRequest;
+import com.uxelf.dev.ticketDealer.dto.event.EventResponse;
 import com.uxelf.dev.ticketDealer.entity.EventSeat;
 import com.uxelf.dev.ticketDealer.repository.EventSeatRepository;
 import org.junit.jupiter.api.*;

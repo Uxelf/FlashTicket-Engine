@@ -1,6 +1,6 @@
 package com.uxelf.dev.ticketDealer.service;
 
-import com.uxelf.dev.ticketDealer.dto.EventRequest;
+import com.uxelf.dev.ticketDealer.dto.event.EventRequest;
 import com.uxelf.dev.ticketDealer.entity.Event;
 import com.uxelf.dev.ticketDealer.entity.EventSeat;
 import com.uxelf.dev.ticketDealer.entity.Room;

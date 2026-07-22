@@ -1,11 +1,8 @@
-package com.uxelf.dev.ticketDealer.dto;
+package com.uxelf.dev.ticketDealer.dto.event;
 
 import com.uxelf.dev.ticketDealer.entity.Event;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Getter
 @Setter

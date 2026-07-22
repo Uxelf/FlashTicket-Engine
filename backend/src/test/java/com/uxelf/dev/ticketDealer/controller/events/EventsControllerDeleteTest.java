@@ -3,7 +3,7 @@ package com.uxelf.dev.ticketDealer.controller.events;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.uxelf.dev.ticketDealer.component.AppConfig;
-import com.uxelf.dev.ticketDealer.dto.EventRequest;
+import com.uxelf.dev.ticketDealer.dto.event.EventRequest;
 import com.uxelf.dev.ticketDealer.entity.Event;
 import com.uxelf.dev.ticketDealer.repository.EventRepository;
 import org.junit.jupiter.api.Assertions;

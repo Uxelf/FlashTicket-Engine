@@ -3,6 +3,7 @@ package com.uxelf.dev.ticketDealer.exception;
 import com.uxelf.dev.ticketDealer.dto.ErrorResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -52,6 +53,17 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<ErrorResponse> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException exception){
+        Map<String,String> errors = new HashMap<>();
+        errors.put("error", exception.getMessage());
+
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setErrors(errors);
+
+        return ResponseEntity.badRequest().body(errorResponse);
+    }
+
+    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+    public ResponseEntity<ErrorResponse> handleHttpMediaTypeNotSupportedException(HttpMediaTypeNotSupportedException exception){
         Map<String,String> errors = new HashMap<>();
         errors.put("error", exception.getMessage());
 

@@ -1,4 +1,4 @@
-package com.uxelf.dev.ticketDealer.dto;
+package com.uxelf.dev.ticketDealer.dto.event;
 
 import com.uxelf.dev.ticketDealer.entity.Event;
 import lombok.Getter;
