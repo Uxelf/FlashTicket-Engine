@@ -5,6 +5,7 @@ import com.uxelf.dev.ticketDealer.entity.Event;
 import com.uxelf.dev.ticketDealer.entity.EventSeat;
 import com.uxelf.dev.ticketDealer.entity.Room;
 import com.uxelf.dev.ticketDealer.entity.Seat;
+import com.uxelf.dev.ticketDealer.exception.AppBadRequestException;
 import com.uxelf.dev.ticketDealer.repository.EventRepository;
 import com.uxelf.dev.ticketDealer.repository.EventSeatRepository;
 import com.uxelf.dev.ticketDealer.repository.RoomRepository;
@@ -87,4 +88,17 @@ public class EventsService {
         return true;
     }
 
+    public List<Seat> getEventSeats(UUID eventId){
+        List<Seat> eventSeats = new ArrayList<>();
+
+        Optional<Event> eventOptional = eventRepository.findById(eventId);
+        if (eventOptional.isEmpty())
+            throw new AppBadRequestException("Event does not exists");
+
+        List<EventSeat> eventSeatList = eventSeatRepository.findByEvent(eventOptional.get());
+
+        eventSeats = eventSeatList.stream().map(EventSeat::getSeat).toList();
+
+        return eventSeats;
+    }
 }
