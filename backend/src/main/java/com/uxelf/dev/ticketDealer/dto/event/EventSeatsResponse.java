@@ -16,7 +16,7 @@ public class EventSeatsResponse {
     @Getter
     public static
     class SeatData{
-        UUID id;
+        UUID eventSeatId;
         int row;
         int number;
     }

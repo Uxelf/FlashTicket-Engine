@@ -130,7 +130,7 @@ public class EventsControllerGetSeatsTest {
         MvcResult eventsResult = mockMvc.perform(post("/api/events").contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
-                .andReturn();;
+                .andReturn();
 
         String eventsJson = eventsResult.getResponse().getContentAsString();
         EventResponse eventResponse = objectMapper.readValue(eventsJson, EventResponse.class);

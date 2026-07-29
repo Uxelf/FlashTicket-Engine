@@ -88,16 +88,14 @@ public class EventsService {
         return true;
     }
 
-    public List<Seat> getEventSeats(UUID eventId){
-        List<Seat> eventSeats = new ArrayList<>();
+    public List<EventSeat> getEventSeats(UUID eventId){
+        List<EventSeat> eventSeats = new ArrayList<>();
 
         Optional<Event> eventOptional = eventRepository.findById(eventId);
         if (eventOptional.isEmpty())
             throw new AppBadRequestException("Event does not exists");
 
-        List<EventSeat> eventSeatList = eventSeatRepository.findByEvent(eventOptional.get());
-
-        eventSeats = eventSeatList.stream().map(EventSeat::getSeat).toList();
+        eventSeats = eventSeatRepository.findByEvent(eventOptional.get());
 
         return eventSeats;
     }
