@@ -1,10 +1,9 @@
 package com.uxelf.dev.ticketDealer.controller;
 
-import com.uxelf.dev.ticketDealer.dto.event.EventDeleteResponse;
-import com.uxelf.dev.ticketDealer.dto.event.EventListResponse;
-import com.uxelf.dev.ticketDealer.dto.event.EventRequest;
-import com.uxelf.dev.ticketDealer.dto.event.EventResponse;
+import com.uxelf.dev.ticketDealer.dto.event.*;
 import com.uxelf.dev.ticketDealer.entity.Event;
+import com.uxelf.dev.ticketDealer.entity.EventSeat;
+import com.uxelf.dev.ticketDealer.entity.Seat;
 import com.uxelf.dev.ticketDealer.exception.AppBadRequestException;
 import com.uxelf.dev.ticketDealer.service.EventsService;
 import jakarta.validation.Valid;
@@ -64,5 +63,23 @@ public class EventsController {
         }
         throw new AppBadRequestException("Event does not exists");
 
+    }
+
+    @GetMapping("/{id}/seats")
+    public ResponseEntity<EventSeatsResponse> getEventSeats(@PathVariable UUID id){
+
+        EventSeatsResponse response = new EventSeatsResponse();
+        List<EventSeat> seatList = eventsService.getEventSeats(id);
+        List<EventSeatsResponse.SeatData> seatDataList = seatList.stream()
+                .map(seat -> {
+                    EventSeatsResponse.SeatData data = new EventSeatsResponse.SeatData();
+                    data.setEventSeatId(seat.getId());
+                    data.setRow(seat.getSeat().getRow());
+                    data.setNumber(seat.getSeat().getNumber());
+                    return data;
+                })
+                .toList();
+        response.setSeats(seatDataList);
+        return ResponseEntity.ok(response);
     }
 }
