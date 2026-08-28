@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -31,5 +32,5 @@ public class EventSeat {
     private Seat seat;
 
     @Enumerated (EnumType.STRING)
-    private SeatStatus seatStatus;
+    private SeatStatus seatStatus = SeatStatus.FREE;
 }
