@@ -1,6 +1,7 @@
 package com.uxelf.dev.ticketDealer.exception;
 
 import com.uxelf.dev.ticketDealer.dto.ErrorResponse;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
@@ -49,6 +50,17 @@ public class GlobalExceptionHandler {
         errorResponse.setErrors(errors);
 
         return ResponseEntity.badRequest().body(errorResponse);
+    }
+
+    @ExceptionHandler(AppConflictRequestException.class)
+    public ResponseEntity<ErrorResponse> handleAppConflictRequestException(AppConflictRequestException exception){
+        Map<String,String> errors = new HashMap<>();
+        errors.put("error", exception.getMessage());
+
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setErrors(errors);
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
