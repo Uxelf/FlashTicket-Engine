@@ -1,5 +1,6 @@
 package com.uxelf.dev.ticketDealer.controller.reservations;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.uxelf.dev.ticketDealer.component.AppConfig;
 import com.uxelf.dev.ticketDealer.dto.event.EventRequest;
@@ -13,6 +14,7 @@ import com.uxelf.dev.ticketDealer.entity.Reservation;
 import com.uxelf.dev.ticketDealer.enums.SeatStatus;
 import com.uxelf.dev.ticketDealer.repository.EventSeatRepository;
 import com.uxelf.dev.ticketDealer.repository.ReservationRepository;
+import lombok.AllArgsConstructor;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,6 +22,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -30,8 +33,14 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -191,5 +200,64 @@ public class ReservationsControllerCreateTest {
         mockMvc.perform(post("/api/reservations").contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isConflict());
+    }
+
+    @Test
+    void whenMultipleSimultaneousReservations_thenOnlyOneWorks() throws Exception{
+        int threadsCount = 1000;
+        CountDownLatch startLatch = new CountDownLatch(1);
+        CountDownLatch endLatch = new CountDownLatch(threadsCount);
+        List<HttpStatus> requestResults = Collections.synchronizedList(new ArrayList<>());
+
+        AppConfig.RoomProperties roomProperties = appConfig.getRooms().stream().toList().getFirst();
+        Assertions.assertTrue(roomProperties.getRows() > 0 && roomProperties.getSeatsPerRow() > 0);
+        ReservationRequest request = new ReservationRequest(
+                mainEventId, username, 1, 1
+        );
+
+        try (ExecutorService executor = Executors.newFixedThreadPool(threadsCount)) {
+            for (int i = 0; i < threadsCount; i++){
+                executor.submit(new WaitingReserver(startLatch, endLatch, request, requestResults));
+            }
+            startLatch.countDown();
+            endLatch.await();
+        }
+        List<Reservation> reservationList = reservationRepository.findAll();
+        int okResults = requestResults.stream().filter(value -> value == HttpStatus.OK).toList().size();
+        int conflictResults = requestResults.stream().filter(value -> value == HttpStatus.CONFLICT).toList().size();
+        Assertions.assertEquals(1, reservationList.size());
+        Assertions.assertEquals(threadsCount, requestResults.size());
+        Assertions.assertEquals(1, okResults);
+        Assertions.assertEquals(threadsCount - 1, conflictResults);
+
+    }
+
+    @AllArgsConstructor
+    public class WaitingReserver implements Runnable{
+
+        private CountDownLatch startLatch;
+        private CountDownLatch endLatch;
+        private ReservationRequest request;
+        private List<HttpStatus> requestResults;
+
+
+        @Override
+        public void run() {
+            try {
+                startLatch.await();
+                HttpStatus requestStatus = SendRequest();
+                requestResults.add(requestStatus);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            } finally {
+                endLatch.countDown();
+            }
+        }
+
+        private HttpStatus SendRequest() throws Exception {
+            int status = mockMvc.perform(post("/api/reservations").contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(request))).andReturn().getResponse().getStatus();
+            return HttpStatus.valueOf(status);
+        }
     }
 }

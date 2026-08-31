@@ -33,4 +33,7 @@ public class EventSeat {
 
     @Enumerated (EnumType.STRING)
     private SeatStatus seatStatus = SeatStatus.FREE;
+
+    @Version
+    private Integer version;
 }

@@ -8,6 +8,7 @@ import com.uxelf.dev.ticketDealer.exception.AppBadRequestException;
 import com.uxelf.dev.ticketDealer.exception.AppConflictRequestException;
 import com.uxelf.dev.ticketDealer.repository.*;
 import lombok.AllArgsConstructor;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -44,7 +45,11 @@ public class ReservationsService {
         }
 
         eventSeat.setSeatStatus(SeatStatus.RESERVED);
-        eventSeatRepository.save(eventSeat);
+        try{
+            eventSeatRepository.save(eventSeat);
+        } catch (ObjectOptimisticLockingFailureException e){
+            throw new AppConflictRequestException("Seat is not free");
+        }
 
         Reservation reservation = new Reservation();
         reservation.setEventSeat(eventSeat);
