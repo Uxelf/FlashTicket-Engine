@@ -28,4 +28,5 @@ public class Reservation {
     private User user;
 
     private LocalDateTime expiresAt;
+    boolean confirmed = false;
 }
