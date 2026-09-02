@@ -1,5 +1,6 @@
 package com.uxelf.dev.ticketDealer.service;
 
+import com.uxelf.dev.ticketDealer.component.AppConfig;
 import com.uxelf.dev.ticketDealer.dto.reservation.ReservationConfirmRequest;
 import com.uxelf.dev.ticketDealer.dto.reservation.ReservationConfirmResponse;
 import com.uxelf.dev.ticketDealer.dto.reservation.ReservationResponse;
@@ -11,19 +12,25 @@ import com.uxelf.dev.ticketDealer.exception.AppConflictRequestException;
 import com.uxelf.dev.ticketDealer.repository.*;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ReservationsService {
 
-    private EventRepository eventRepository;
-    private UserRepository userRepository;
-    private EventSeatRepository eventSeatRepository;
-    private ReservationRepository reservationRepository;
+    private final EventRepository eventRepository;
+    private final UserRepository userRepository;
+    private final EventSeatRepository eventSeatRepository;
+    private final ReservationRepository reservationRepository;
+
+    @Value("${app.reservationExpirationMinutes}")
+    private int expirationMinutes;
 
     public ReservationResponse reserveSeat(UUID eventId, String username, int seatRow, int seatNumber){
 
@@ -51,9 +58,12 @@ public class ReservationsService {
             throw new AppConflictRequestException("Seat is not free");
         }
 
+        LocalDateTime expirationTime = LocalDateTime.now().plusMinutes(expirationMinutes);
+
         Reservation reservation = new Reservation();
         reservation.setEventSeat(eventSeat);
         reservation.setUser(userOptional.get());
+        reservation.setExpiresAt(expirationTime);
         reservationRepository.save(reservation);
 
         ReservationResponse response = new ReservationResponse();
