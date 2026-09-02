@@ -17,5 +17,6 @@ public class ReservationsListResponse {
     public static class ReservationData{
         private UUID reservationId;
         private LocalDateTime expiresAt;
+        private boolean confirmed;
     }
 }

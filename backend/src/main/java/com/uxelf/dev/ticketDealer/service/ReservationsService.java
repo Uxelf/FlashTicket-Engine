@@ -1,5 +1,7 @@
 package com.uxelf.dev.ticketDealer.service;
 
+import com.uxelf.dev.ticketDealer.dto.reservation.ReservationConfirmRequest;
+import com.uxelf.dev.ticketDealer.dto.reservation.ReservationConfirmResponse;
 import com.uxelf.dev.ticketDealer.dto.reservation.ReservationResponse;
 import com.uxelf.dev.ticketDealer.dto.reservation.ReservationsListResponse;
 import com.uxelf.dev.ticketDealer.entity.*;
@@ -7,14 +9,12 @@ import com.uxelf.dev.ticketDealer.enums.SeatStatus;
 import com.uxelf.dev.ticketDealer.exception.AppBadRequestException;
 import com.uxelf.dev.ticketDealer.exception.AppConflictRequestException;
 import com.uxelf.dev.ticketDealer.repository.*;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @AllArgsConstructor
@@ -77,10 +77,42 @@ public class ReservationsService {
             ReservationsListResponse.ReservationData data = new ReservationsListResponse.ReservationData();
             data.setReservationId(reservation.getId());
             data.setExpiresAt(reservation.getExpiresAt());
+            data.setConfirmed(reservation.isConfirmed());
             reservationDataList.add(data);
         }
 
         response.setReservationDataList(reservationDataList);
+        return response;
+    }
+
+    @Transactional
+    public ReservationConfirmResponse confirmReservation(String username, UUID reservationId){
+        if (!userRepository.existsByUsername(username)){
+            throw new AppBadRequestException("Username does not exists");
+        }
+
+        Optional<Reservation> reservationOptional = reservationRepository.findById(reservationId);
+        if (reservationOptional.isEmpty()){
+            throw new AppBadRequestException("Reservation does not exists");
+        }
+
+        Reservation userReservation = reservationOptional.get();
+        if (!Objects.equals(userReservation.getUser().getUsername(), username)){
+            throw new AppBadRequestException("User didn't reserve that");
+        }
+
+        if (userReservation.isConfirmed()){
+            throw new AppConflictRequestException("Reservation is already confirmed");
+        }
+
+        userReservation.setConfirmed(true);
+        reservationRepository.save(userReservation);
+
+        EventSeat userEventSeat = userReservation.getEventSeat();
+        userEventSeat.setSeatStatus(SeatStatus.OCCUPIED);
+
+        ReservationConfirmResponse response = new ReservationConfirmResponse();
+        response.setMessage("Reservation confirmed");
         return response;
     }
 }

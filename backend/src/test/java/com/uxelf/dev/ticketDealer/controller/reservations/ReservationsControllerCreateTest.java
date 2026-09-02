@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.uxelf.dev.ticketDealer.component.AppConfig;
 import com.uxelf.dev.ticketDealer.dto.event.EventRequest;
 import com.uxelf.dev.ticketDealer.dto.event.EventResponse;
+import com.uxelf.dev.ticketDealer.dto.reservation.ReservationConfirmRequest;
 import com.uxelf.dev.ticketDealer.dto.reservation.ReservationRequest;
 import com.uxelf.dev.ticketDealer.dto.reservation.ReservationResponse;
 import com.uxelf.dev.ticketDealer.dto.user.UserRequest;
@@ -33,10 +34,7 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -230,6 +228,83 @@ public class ReservationsControllerCreateTest {
         Assertions.assertEquals(1, okResults);
         Assertions.assertEquals(threadsCount - 1, conflictResults);
 
+    }
+
+    @Test
+    void whenConfirmationIsValid_thenReturnOk() throws Exception{
+        AppConfig.RoomProperties roomProperties = appConfig.getRooms().stream().toList().getFirst();
+        Assertions.assertTrue(roomProperties.getRows() > 0 && roomProperties.getSeatsPerRow() > 0);
+        ReservationRequest reservationRequest = new ReservationRequest(
+                mainEventId, username, 1, 1
+        );
+        MvcResult reservationResult = mockMvc.perform(post("/api/reservations").contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(reservationRequest)))
+                .andExpect(status().isOk()).andReturn();
+        String json = reservationResult.getResponse().getContentAsString();
+        ReservationResponse reservationResponse = objectMapper.readValue(json, ReservationResponse.class);
+
+        ReservationConfirmRequest reservationConfirmRequest = new ReservationConfirmRequest(username, reservationResponse.getReservationId());
+        mockMvc.perform(post("/api/reservations/confirm").contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(reservationConfirmRequest)))
+                .andExpect(status().isOk());
+
+        Optional<Reservation> reservationOptional = reservationRepository.findById(reservationResponse.getReservationId());
+        Assertions.assertTrue(reservationOptional.isPresent());
+        Reservation reservation = reservationOptional.get();
+        Assertions.assertEquals(SeatStatus.OCCUPIED, reservation.getEventSeat().getSeatStatus());
+        Assertions.assertTrue(reservation.isConfirmed());
+        Assertions.assertEquals(username, reservation.getUser().getUsername());
+    }
+
+    @Test
+    void whenInvalidConfirmationData_thenReturnBadRequest() throws Exception{
+        AppConfig.RoomProperties roomProperties = appConfig.getRooms().stream().toList().getFirst();
+        Assertions.assertTrue(roomProperties.getRows() > 0 && roomProperties.getSeatsPerRow() > 0);
+        ReservationRequest reservationRequest = new ReservationRequest(
+                mainEventId, username, 1, 1
+        );
+        MvcResult reservationResult = mockMvc.perform(post("/api/reservations").contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(reservationRequest)))
+                .andExpect(status().isOk()).andReturn();
+        String json = reservationResult.getResponse().getContentAsString();
+        ReservationResponse reservationResponse = objectMapper.readValue(json, ReservationResponse.class);
+
+
+        ReservationConfirmRequest reservationConfirmRequest1 = new ReservationConfirmRequest(username, UUID.randomUUID());
+        ReservationConfirmRequest reservationConfirmRequest2 = new ReservationConfirmRequest("%sTest".formatted(username), reservationResponse.getReservationId());
+        ReservationConfirmRequest reservationConfirmRequest3 = new ReservationConfirmRequest("%sTest".formatted(username), UUID.randomUUID());
+
+        mockMvc.perform(post("/api/reservations/confirm").contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(reservationConfirmRequest1)))
+                .andExpect(status().isBadRequest());
+        mockMvc.perform(post("/api/reservations/confirm").contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(reservationConfirmRequest2)))
+                .andExpect(status().isBadRequest());
+        mockMvc.perform(post("/api/reservations/confirm").contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(reservationConfirmRequest3)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void whenReservationIsConfirmed_thenReturnConflict() throws Exception{
+        AppConfig.RoomProperties roomProperties = appConfig.getRooms().stream().toList().getFirst();
+        Assertions.assertTrue(roomProperties.getRows() > 0 && roomProperties.getSeatsPerRow() > 0);
+        ReservationRequest reservationRequest = new ReservationRequest(
+                mainEventId, username, 1, 1
+        );
+        MvcResult reservationResult = mockMvc.perform(post("/api/reservations").contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(reservationRequest)))
+                .andExpect(status().isOk()).andReturn();
+        String json = reservationResult.getResponse().getContentAsString();
+        ReservationResponse reservationResponse = objectMapper.readValue(json, ReservationResponse.class);
+
+        ReservationConfirmRequest reservationConfirmRequest = new ReservationConfirmRequest(username, reservationResponse.getReservationId());
+        mockMvc.perform(post("/api/reservations/confirm").contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(reservationConfirmRequest)))
+                .andExpect(status().isOk());
+        mockMvc.perform(post("/api/reservations/confirm").contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(reservationConfirmRequest)))
+                .andExpect(status().isConflict());
     }
 
     @AllArgsConstructor
