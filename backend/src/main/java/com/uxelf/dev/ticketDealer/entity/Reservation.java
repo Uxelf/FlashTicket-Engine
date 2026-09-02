@@ -27,6 +27,6 @@ public class Reservation {
     @JoinColumn (name = "user_id", referencedColumnName = "id")
     private User user;
 
-    private LocalDateTime expiresAt;
+    private LocalDateTime expiresAt = LocalDateTime.now();
     boolean confirmed = false;
 }
